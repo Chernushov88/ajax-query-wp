@@ -1,0 +1,12 @@
+# Ігноруємо ядро WordPress
+/wp-admin/
+/wp-includes/
+/wp-content/uploads/
+node_modules/
+/vendor/
+wp-*.php
+license.txt
+readme.html
+
+# Ігноруємо конфіг
+wp-config.php
