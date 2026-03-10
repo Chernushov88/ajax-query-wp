@@ -20,7 +20,7 @@
 
 	<footer id="colophon" class="site-footer" role="containinfo">
 
-		<form id="true-get-id" action="">
+		<form id="true-get-id" action="POST">
 			<h3>Find out the post title</h3>
 			<input type="text" name="post_id" placeholder="Enter thi page ID" />
 			<button class="button">Submit</button>
