@@ -8,3 +8,9 @@ Version: 1.0
 body {
 	opacity: 1;
 }
+.error{
+	border-color: red !important;
+}
+.text-error{
+	color: red !important;
+}
