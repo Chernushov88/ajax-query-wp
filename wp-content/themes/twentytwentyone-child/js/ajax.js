@@ -50,4 +50,43 @@ jQuery(function ($) {
 
     return false;
   });
+
+  const button = $("#loadmore a"),
+    maxPages = button.data("max_pages");
+  var paged = button.data("paged");
+
+  button.click(function (event) {
+    event.preventDefault();
+
+    if (!$("body").hasClass("loading")) {
+      $.ajax({
+        type: "POST",
+        url: serhii.ajax_url,
+        data: {
+          paged: paged,
+          action: "loadmore",
+          taxonomy: button.data("taxonomy"),
+          term_id: button.data("term-id"),
+          pagenumlink: button.data("pagenumlink"),
+        },
+        dataType: "json",
+        beforeSend: function (xhr) {
+          console.log("taxonomy", button.data("taxonomy"));
+          button.text("Loading...");
+          $("body").addClass("loading");
+        },
+        success: function (data) {
+          paged++;
+          button.parent().before(data.posts);
+          $("#pagination").html(data.pagination);
+          button.text("Load more");
+
+          if (paged == maxPages) {
+            button.remote();
+          }
+          $("body").removeClass("loading");
+        },
+      });
+    }
+  });
 });
