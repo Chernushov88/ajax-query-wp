@@ -143,6 +143,7 @@ add_action('wp_head', 'true_track_post_views');
 function true_loadmore() {
 	$paged = !empty($_POST['paged']) ? $_POST['paged'] : 1;
 	$paged++;
+	global $wp_query;
 
 	$args = array(
 		'paged' => $paged,
@@ -178,8 +179,10 @@ function true_loadmore() {
 	ob_get_clean();
 
 	echo json_encode( array(
-		'posts' => $posts,
-		'pagination' => str_replace( admin_url( 'admin-ajax.php' ), $_POST[ 'pagenumlink' ], $pagination )
+		'posts'      => $posts,
+		'pagination' => str_replace( admin_url( 'admin-ajax.php' ), $_POST[ 'pagenumlink' ], $pagination ),
+		'max_pages'  => $wp_query->max_num_pages,
+		'paged'      => $paged
 	) );
 
 	die;

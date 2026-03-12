@@ -51,9 +51,9 @@ jQuery(function ($) {
     return false;
   });
 
-  const button = $("#loadmore a"),
-    maxPages = button.data("max_pages");
-  var paged = button.data("paged");
+  const button = $("#loadmore a");
+  let maxPages = button.data("max_pages"),
+      paged = button.data("paged");
 
   button.click(function (event) {
     event.preventDefault();
@@ -76,13 +76,15 @@ jQuery(function ($) {
           $("body").addClass("loading");
         },
         success: function (data) {
-          paged++;
+          paged = data.paged;
+          maxPages = data.max_pages;
+
           button.parent().before(data.posts);
           $("#pagination").html(data.pagination);
           button.text("Load more");
 
-          if (paged == maxPages) {
-            button.remote();
+          if (paged >= maxPages) {
+            button.remove();
           }
           $("body").removeClass("loading");
         },
