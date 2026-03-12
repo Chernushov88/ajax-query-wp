@@ -23,6 +23,8 @@ get_header(); ?>
 <?php endif; ?>
 
 <?php
+	get_template_part('template-parts/filters');
+
 if ( have_posts() ) {
 
 	// Load posts loop.
@@ -31,9 +33,7 @@ if ( have_posts() ) {
 
 		get_template_part( 'template-parts/content/content', get_theme_mod( 'display_excerpt_or_full_post', 'excerpt' ) );
 	}
-
-	
-		get_template_part('loadmore');
+	get_template_part('template-parts/loadmore');	
 	
 
 	// Previous/next page navigation.

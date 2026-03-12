@@ -4,7 +4,7 @@ function twentytwentyone_child_enqueue_styles() {
 		'twentytwentyone-child-style',
 		get_stylesheet_uri(),
 		array('twenty-twenty-one-style'),
-		wp_get_theme()->get('Version')
+		wp_get_theme()->get('1.01')
 	);
 }
 add_action('wp_enqueue_scripts', 'twentytwentyone_child_enqueue_styles');

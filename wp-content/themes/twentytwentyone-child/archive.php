@@ -29,7 +29,7 @@ $description = get_the_archive_description();
 	<?php endwhile; ?>
 
 	<?php
-		get_template_part('loadmore');
+		get_template_part('template-parts/loadmore');
 	?>
 
 	
