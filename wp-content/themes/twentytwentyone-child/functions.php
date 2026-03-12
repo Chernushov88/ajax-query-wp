@@ -4,7 +4,7 @@ function twentytwentyone_child_enqueue_styles() {
 		'twentytwentyone-child-style',
 		get_stylesheet_uri(),
 		array('twenty-twenty-one-style'),
-		wp_get_theme()->get('1.01')
+		wp_get_theme()->get('1.02')
 	);
 }
 add_action('wp_enqueue_scripts', 'twentytwentyone_child_enqueue_styles');
@@ -190,3 +190,104 @@ function true_loadmore() {
 
 add_action('wp_ajax_loadmore', 'true_loadmore');
 add_action('wp_ajax_nopriv_loadmore', 'true_loadmore');
+
+
+/* ***
+* Filters
+*/
+// ADD web-site scripts
+function filter_scripts() {
+    wp_register_script(
+        'filter',
+        get_stylesheet_directory_uri() . '/js/filter.js',
+        array('jquery'),
+        time(),
+        true
+    );		
+    wp_enqueue_script('filter');
+}
+add_action('wp_enqueue_scripts', 'filter_scripts');
+
+
+function true_filter_function(){
+	echo '<pre>';
+	// print_r($_POST);
+	echo '</pre>';
+
+	$args = array(
+		'orderby' => 'date', // сортировка по дате
+		'order'	=> $_POST[ 'date' ], // ASC или DESC
+		'post_type' => 'post',
+		'posts_per_page' => -1
+	);
+ 
+	// для таксономий
+	if( !empty( $_POST[ 'categoryfilter' ] )) {
+		$args[ 'tax_query' ] = array(
+			array(
+				'taxonomy' => 'category',
+				'field' => 'id',
+				'terms' => intval($_POST[ 'categoryfilter' ])
+			)
+		);
+	}
+ 
+	// создаём массив $args[ 'meta_query' ] если указана хотя бы одна цена или отмечен чекбокс
+	if( 
+		isset( $_POST[ 'cena_min' ] ) 
+		|| isset( $_POST[ 'cena_max' ] ) 
+		|| isset( $_POST[ 'featured_image' ] ) && 'on' == $_POST[ 'featured_image' ]
+	) {
+		$args[ 'meta_query' ] = array( 'relation' => 'AND' );
+ 	}
+ 
+	// условие 1: цена больше $_POST[ 'cena_min' ]
+	// if( empty( $_POST[ 'cena_min' ] ) ) {
+	// 	$args[ 'meta_query' ][] = array(
+	// 		'key' => 'cena',
+	// 		'value' => $_POST[ 'cena_min' ],
+	// 		'type' => 'numeric',
+	// 		'compare' => '>'
+	// 	);
+	// }
+ 
+	// // условие 2: цена меньше $_POST[ 'cena_max' ]
+	// if( empty( $_POST[ 'cena_max' ] ) ) {
+	// 	$args[ 'meta_query' ][] = array(
+	// 		'key' => 'cena',
+	// 		'value' => $_POST[ 'cena_max' ],
+	// 		'type' => 'numeric',
+	// 		'compare' => '<'
+	// 	);
+	// }
+ 
+	// условие 3: миниатюра имеется
+	if( isset( $_POST[ 'featured_image' ] ) && 'on' == $_POST[ 'featured_image' ] ) {
+		$args[ 'meta_query' ][] = array(
+			'key' => '_thumbnail_id',
+			'value' => '',
+			'compare' => '!='
+		);
+	}
+ 
+	$query = new WP_Query($args);
+	if ($query->have_posts()) {
+			while ($query->have_posts()) {
+					$query->the_post();
+					// if (has_post_thumbnail()) {}
+						echo '<a href="' . get_permalink() . '">' . get_the_title() . '</a>';
+					
+			}
+			wp_reset_postdata();
+	} else {
+			echo 'Nothing found';
+	}
+ 
+	die();
+}
+
+add_action('wp_ajax_myfilter', 'true_filter_function');
+add_action('wp_ajax_nopriv_myfilter', 'true_filter_function');
+
+
+

@@ -14,3 +14,39 @@ body {
 .text-error{
 	color: red !important;
 }
+
+.container{
+	max-width: 1200px;
+	margin: 0 auto;
+}
+.row{
+	display: flex;
+	flex-wrap: wrap;
+}
+.row .col{
+	width: 19%;
+	min-width: 200px;
+	padding: 0 10px;
+}
+.row .col:first-child{
+	width: 24%;
+}
+
+.row .col input, .row .col select{
+	max-width: 100%;
+}
+.row .col label{
+	display: flex;
+	margin: 0 0 0 0px;
+}
+.row .col label input{
+	margin-right: 5px;
+}
+.container form button{
+	display: flex;
+	margin: 2vh 0 2vh auto;
+}
+
+#response a{
+	display: block;
+}
