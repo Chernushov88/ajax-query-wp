@@ -18,6 +18,9 @@
 // });
 
 jQuery(function ($) {
+  /* ***
+   * Found Posts
+   */
   $("#true-get-id").submit(function (event) {
     event.preventDefault();
 
@@ -51,9 +54,12 @@ jQuery(function ($) {
     return false;
   });
 
+  /* ***
+   * Load More
+   */
   const button = $("#loadmore a");
   let maxPages = button.data("max_pages"),
-      paged = button.data("paged");
+    paged = button.data("paged");
 
   button.click(function (event) {
     event.preventDefault();
@@ -90,5 +96,69 @@ jQuery(function ($) {
         },
       });
     }
+  });
+
+  /* ***
+   * Comments
+   */
+  $("#commentform").submit(function () {
+    let commentform = $(this);
+    ((respond = $("#respond")), (commentList = $(".comment-list")));
+
+    $.ajax({
+      type: "POST",
+      url: serhii.ajax_url,
+      data: commentform.serialize() + "&action=sendcomment",
+      beforeSend: function (xhr) {
+        $("#submit").val("Send");
+      },
+      error: function (request, status, error) {
+        // обрабатываем ошибки
+        if (status == 500) {
+          alert("Ошибка при добавлении комментария");
+        } else if (status == "timeout") {
+          alert("Ошибка: Сервер не отвечает, попробуй ещё.");
+        } else {
+          // ворпдрессовские ошибочки, не уверен, что это самый оптимальный вариант
+          // если знаете способ получше - поделитесь
+          var errormsg = request.responseText;
+          var string1 = errormsg.split("<p>");
+          var string2 = string1[1].split("</p>");
+          // alert(string2[0]);
+        }
+      },
+      success: function (newComment) {
+        if ($(".comment-list li").length > 0) {
+          if (respond.parent().hasClass("comment")) {
+            if (respond.parent().children(".children").length > 0) {
+              respond.parent().children(".children").append(newComment);
+            } else {
+              // если первый дочерний
+              respond.after('<ol class="children">' + newComment + "</ol>");
+            }
+          } else {
+            commentList.append(newComment);
+          }
+        } else {
+          respond.before('<ol class="comment-list">' + newComment + "</ol>");
+        }
+
+        // очищаємо поле
+        $("#comment").val("");
+
+        // скидаємо parent
+        $("#comment_parent").val("0");
+
+        // ховаємо reply cancel
+        $("#cancel-comment-reply-link").hide();
+
+        // переносимо форму назад
+        $(".comment-list").after(respond);
+
+        $("#submit").val("Post comment");
+        // $("submit").val("Post Comment");
+      },
+    });
+    return false;
   });
 });

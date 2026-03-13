@@ -291,3 +291,43 @@ add_action('wp_ajax_nopriv_myfilter', 'true_filter_function');
 
 
 
+/* ***
+* Comments
+*/
+
+
+function true_commentform() {	
+	$comment = wp_handle_comment_submission( wp_unslash( $_POST ) );
+	if ( is_wp_error( $comment ) ) {
+		$data = (int) $comment->get_error_data();
+		if ( ! empty( $data ) ) {
+			wp_die(
+				'<p>' . $comment->get_error_message() . '</p>',
+				__( 'Comment Submission Failure' ),
+				array(
+					'response'  => $data,
+					'back_link' => true,
+				)
+			);
+		} else {
+			exit;
+		}
+	}
+
+	$user            = wp_get_current_user();
+	$cookies_consent = ( isset( $_POST['wp-comment-cookies-consent'] ) );	
+
+	do_action( 'set_comment_cookies', $comment, $user, $cookies_consent );
+
+	wp_list_comments(
+		array(
+			'avatar_size' => 60,
+			'style'       => 'ol',
+			'short_ping'  => true,
+		),
+		array($comment)
+	);
+}
+
+add_action('wp_ajax_sendcomment', 'true_commentform');
+add_action('wp_ajax_nopriv_sendcomment', 'true_commentform');
