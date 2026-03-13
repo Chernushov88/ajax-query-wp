@@ -242,24 +242,24 @@ function true_filter_function(){
  	}
  
 	// условие 1: цена больше $_POST[ 'cena_min' ]
-	// if( empty( $_POST[ 'cena_min' ] ) ) {
-	// 	$args[ 'meta_query' ][] = array(
-	// 		'key' => 'cena',
-	// 		'value' => $_POST[ 'cena_min' ],
-	// 		'type' => 'numeric',
-	// 		'compare' => '>'
-	// 	);
-	// }
+	if( !empty( $_POST[ 'cena_min' ] ) ) {
+		$args[ 'meta_query' ][] = array(
+			'key' => 'cena',
+			'value' => $_POST[ 'cena_min' ],
+			'type' => 'numeric',
+			'compare' => '>'
+		);
+	}
  
-	// // условие 2: цена меньше $_POST[ 'cena_max' ]
-	// if( empty( $_POST[ 'cena_max' ] ) ) {
-	// 	$args[ 'meta_query' ][] = array(
-	// 		'key' => 'cena',
-	// 		'value' => $_POST[ 'cena_max' ],
-	// 		'type' => 'numeric',
-	// 		'compare' => '<'
-	// 	);
-	// }
+	// условие 2: цена меньше $_POST[ 'cena_max' ]
+	if( !empty( $_POST[ 'cena_max' ] ) ) {
+		$args[ 'meta_query' ][] = array(
+			'key' => 'cena',
+			'value' => $_POST[ 'cena_max' ],
+			'type' => 'numeric',
+			'compare' => '<'
+		);
+	}
  
 	// условие 3: миниатюра имеется
 	if( isset( $_POST[ 'featured_image' ] ) && 'on' == $_POST[ 'featured_image' ] ) {
