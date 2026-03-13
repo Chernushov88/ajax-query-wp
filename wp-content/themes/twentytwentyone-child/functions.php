@@ -294,8 +294,6 @@ add_action('wp_ajax_nopriv_myfilter', 'true_filter_function');
 /* ***
 * Comments
 */
-
-
 function true_commentform() {	
 	$comment = wp_handle_comment_submission( wp_unslash( $_POST ) );
 	if ( is_wp_error( $comment ) ) {
@@ -328,6 +326,147 @@ function true_commentform() {
 		array($comment)
 	);
 }
-
 add_action('wp_ajax_sendcomment', 'true_commentform');
 add_action('wp_ajax_nopriv_sendcomment', 'true_commentform');
+
+
+/* ***
+* Contact form 
+*/
+function validation_scripts() {
+    wp_enqueue_script(
+        'contact-form-validation',
+        get_stylesheet_directory_uri() . '/js/validation-contactform.js',
+        array('jquery'),
+        '1.0',
+        true
+    );		
+		wp_localize_script('contact-form-validation', 'serhii', array(
+        'ajax_url' => admin_url('admin-ajax.php')
+    ));
+
+}
+add_action('wp_enqueue_scripts', 'validation_scripts');
+
+
+function contact_page_styles() {
+	if(is_page('contact')){
+		wp_enqueue_style(
+			'bootstrap-forms',
+			get_stylesheet_directory_uri() . '/css/bootstrap-forms.css',
+			array(),
+			'1.0'
+		);
+	}
+}
+add_action('wp_enqueue_scripts', 'contact_page_styles');
+
+function true_contactus(){
+	$recepient = "test@gmail.com";
+
+	$first_name = trim($_POST["first_name"]);
+	$last_name = trim($_POST["last_name"]);
+	$user_name = trim($_POST["user_name"]);
+	$email = trim($_POST["mail"]);
+	$phone = trim($_POST["phone"]);
+	$сity = trim($_POST["сity"]);
+	$date_submitted = date('Y-m-d');
+	$time_submitted = date("H:i");
+	
+	$pagetitle = "Contact us";
+
+	$arrayMessage = array(
+		array(
+			'message' => "First Name: ",
+			'field' => $first_name,
+			'icon' => "👤"
+		),
+		array(
+			'message' => "Last Name: ",
+			'field' => $last_name,
+			'icon' => "👤"
+		),
+		array(
+			'message' => "User Name: ",
+			'field' => $user_name,
+			'icon' => "👤"
+		),
+		array(
+			'message' => 'Phone: ',
+			'field' => $phone,
+			'icon' => "☎"
+		),
+		array(
+			'message' => 'E-mail: ',
+			'field' => $email,
+			'icon' => "📧"
+		),
+		array(
+			'message' => 'City: ',
+			'field' => $сity,
+			'icon' => "📅"
+		),
+		array(
+			'message' => 'Дата заявки: ',
+			'field' => $date_submitted . ' ' . $time_submitted,
+			'icon' => "⏲"
+		)
+	);
+	
+	
+	function reduceMessage($arr, $prefix, $iconsEnable)	{
+		$message = '';
+		foreach ($arr as $obj) {
+			if ($obj['field']) {
+				if ($iconsEnable) {
+					if ($obj['icon']) {
+						$icon = $obj['icon'];
+					} else {
+						$icon = '';
+					}
+				} else {
+					$icon = '';
+				}
+				$message .=  $icon . " " . $obj['message'] . $obj['field'] . $prefix;
+			}
+		}
+		return $message;
+	}
+
+	$messageTB = "‼ $pagetitle ‼\n" . reduceMessage($arrayMessage, "\n", true);
+	$messageEmail = reduceMessage($arrayMessage, "<br>", false);
+
+	//SEND MESSAGE TO TELEGRAM
+	function sendMessage($chatID, $message, $token)
+	{
+		$url = "https://api.telegram.org/" . $token . "/sendMessage?chat_id=" . $chatID;
+		$url = $url . "&text=" . urlencode($message);
+		$ch = curl_init();
+		$optArray = array(CURLOPT_URL => $url, CURLOPT_RETURNTRANSFER => true);
+		curl_setopt_array($ch, $optArray);
+		$result = curl_exec($ch);
+		echo $result;
+		curl_close($ch);
+	}
+
+	// send telegram
+	$token = "bot546026860:AAGbAoQE9a8EdJVBXB7IkbxavL6gkvLUrCU";
+	$chatID = "-1001253520742";
+
+	if ($phone == '+38(000) 000-00-00' || $email == 'test@gmail.com') {
+		$chatID = '-1001253520742';
+	} 
+
+	sendMessage($chatID, $messageTB, $token);
+	// Для отправки HTML-письма должен быть установлен заголовок Content-type
+	$headers  = 'MIME-Version: 1.0' . "\r\n";
+	$headers .= 'Content-type: text/html; charset=urf-8' . "\r\n";
+	$headers .= 'From: http://ajax-query-wp.test/contact/';
+
+	mail($recepient, $pagetitle, $messageEmail, $headers);
+	
+	die;
+}
+
+add_action('wp_ajax_contactusform', 'true_contactus');
+add_action('wp_ajax_nopriv_contactusform', 'true_contactus');
