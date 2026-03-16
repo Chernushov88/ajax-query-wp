@@ -161,4 +161,25 @@ jQuery(function ($) {
     });
     return false;
   });
+
+  /* ***
+   * Search
+   */
+  $("input[name='s']").autocomplete({
+    source: function (request, response) {
+      $.ajax({
+        url: serhii.ajax_url,
+        data: {
+          action: "mywebsitesearch",
+          term: request.term,
+        },
+        success: function (data) {
+          response(data);
+        },
+      });
+    },
+    select: function (event, ui) {
+      window.location = ui.item.url;
+    },
+  });
 });

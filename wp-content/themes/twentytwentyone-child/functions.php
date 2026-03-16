@@ -15,23 +15,24 @@ add_action('wp_enqueue_scripts', 'twentytwentyone_child_enqueue_styles');
 */
 // ADD web-site scripts
 function twentytwentyone_child_enqueue_scripts() {
-    wp_register_script(
-        'trueajax',
-        get_stylesheet_directory_uri() . '/js/ajax.js',
-        array('jquery'),
-        time(),
-        true
-    );
+	wp_enqueue_script('juery-ui-autocomplete');
+	wp_register_script(
+			'trueajax',
+			get_stylesheet_directory_uri() . '/js/ajax.js',
+			array('jquery', 'jquery-ui-autocomplete'),
+			time(),
+			true
+	);
 
-    wp_localize_script(
-        'trueajax',
-        'serhii',
-        array(
-            'ajax_url' => admin_url('admin-ajax.php')
-        )
-    );
-		
-    wp_enqueue_script('trueajax');
+	wp_localize_script(
+			'trueajax',
+			'serhii',
+			array(
+					'ajax_url' => admin_url('admin-ajax.php')
+			)
+	);
+	
+	wp_enqueue_script('trueajax');
 }
 add_action('wp_enqueue_scripts', 'twentytwentyone_child_enqueue_scripts');
 
@@ -470,3 +471,35 @@ function true_contactus(){
 
 add_action('wp_ajax_contactusform', 'true_contactus');
 add_action('wp_ajax_nopriv_contactusform', 'true_contactus');
+
+
+/* ***
+* Search
+*/
+function true_search() {	
+	$search_term = isset($_GET['term']) ? $_GET['term'] : '';
+
+	$posts =get_posts( array(
+		'posts_per_page' => -1,
+		'post_type' => array('post', 'pages'),
+		's' => $search_term
+	) );
+
+	$results = array();
+
+	if($posts){
+		foreach($posts as $post){
+			$results[] = array(
+				'id'    => $post->ID,
+				'value' => $post->post_title,
+				'url'   => get_permalink($post->ID)
+			);
+		}
+	}
+
+	wp_send_json($results);
+
+}
+
+add_action('wp_ajax_mywebsitesearch', 'true_search');
+add_action('wp_ajax_nopriv_mywebsitesearch', 'true_search');
